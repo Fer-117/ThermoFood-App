@@ -13,12 +13,6 @@ var mainImageEL = document.getElementById("mainImage");
 var storageBtns = document.getElementById("storageBtns");
 var resetBtn = document.getElementById("reset");
 
-var storeNames = [];
-var storeImages = [];
-var storeCalories = [];
-var storeCarbs = [];
-var storeProtein = [];
-var storeFats = [];
 var storeAdditonalData = [];
 var storeIng = [];
 var storeIns = [];
@@ -42,15 +36,10 @@ function backToMain() {
 }
 
 function resetStorage() {
-  storeNames = [];
-  storeImages = [];
-  storeCalories = [];
-  storeCarbs = [];
-  storeProtein = [];
-  storeFats = [];
   storeAdditonalData = [];
   storeIng = [];
   storeIns = [];
+  contexts = [];
   localStorage.clear();
 }
 
@@ -64,6 +53,10 @@ function showFavorites() {
   var insObjs = localStorage.getItem("instructions");
   var ingObjs = localStorage.getItem("ingredients");
   var addObjs = localStorage.getItem("additional");
+  console.log("LEN: ", dishObjs.split(" || ").length)
+
+  console.log(JSON.parse(dishObjs.split(" || ")[0]))
+  console.log(JSON.parse(dishObjs.split(" || ")[3]))
   mainImageEL.setAttribute(
     "src",
     JSON.parse(dishObjs.split(" || ")[0]).thumbnail_url
@@ -94,7 +87,7 @@ function showFavorites() {
     " g 🥔";
   additionalInformation.innerHTML = addObjs.split(" || ")[0];
   ingredientsList.innerHTML = "";
-  console.log(ingObjs.split(" || ")[0])
+  console.log(ingObjs.split(" || ")[0]);
   for (var ingredient of ingObjs.split(" || ")[0].split(",")) {
     var listItem = document.createElement("li");
     listItem.classList.add("flex");
@@ -107,8 +100,8 @@ function showFavorites() {
   for (var instruction of insObjs.split(" || ")[0].split(".")) {
     var listItem = document.createElement("li");
     if (instruction[0] == ",") {
-      console.log(instruction, "Starts with ,")
-      instruction = instruction.substring(1)
+      console.log(instruction, "Starts with ,");
+      instruction = instruction.substring(1);
     }
     listItem.classList.add("flex");
     listItem.classList.add("items-start");
@@ -118,6 +111,19 @@ function showFavorites() {
 }
 
 function savingRecipie(context, ingredients, instructions) {
+  console.log(localStorage.getItem("fullObj"))
+  if (localStorage.getItem("fullObj")) {
+    storeAdditonalData = [];
+    storeIng = [];
+    storeIns = [];
+    contexts = [];
+    console.log("Storage has something")
+    storeAdditonalData.push(localStorage.getItem("additional"));
+    storeIng.push(localStorage.getItem("ingredients"));
+    storeIns.push(localStorage.getItem("additional"));
+    contexts.push(localStorage.getItem("fullObj"));
+  }
+
   var mainDish = JSON.stringify(context);
   contexts.push(mainDish + " || ");
   var dishArr = [...new Set(contexts)];
