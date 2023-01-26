@@ -19,16 +19,15 @@ var storeCalories = [];
 var storeCarbs = [];
 var storeProtein = [];
 var storeFats = [];
-var storeDescriptions = [];
+var storeAdditonalData = [];
 var storeIng = [];
 var storeIns = [];
+var contexts = [];
 
 function removeValue(value, index, arr) {
- 
   if (value == "n/a") {
-
-      arr.splice(index, 1);
-      return true;
+    arr.splice(index, 1);
+    return true;
   }
   return false;
 }
@@ -43,6 +42,15 @@ function backToMain() {
 }
 
 function resetStorage() {
+  storeNames = [];
+  storeImages = [];
+  storeCalories = [];
+  storeCarbs = [];
+  storeProtein = [];
+  storeFats = [];
+  storeAdditonalData = [];
+  storeIng = [];
+  storeIns = [];
   localStorage.clear();
 }
 
@@ -52,45 +60,93 @@ function showFavorites() {
   dislikeBtn.classList.toggle("hidden");
   back2App.classList.toggle("hidden");
   urRecipies.classList.toggle("hidden");
-  var image = localStorage.getItem("image");
-  var name = localStorage.getItem("name");
-  var calories = localStorage.getItem("calories");
-  var carbs = localStorage.getItem("carbs");
-  var proteins = localStorage.getItem("proteins");
-  var fats = localStorage.getItem("fats");
-  var addData = localStorage.getItem("additional");
-  var ings = localStorage.getItem("ings");
-  var ins = localStorage.getItem("ins");
-  console.log(image.split(","));
-  console.log(name.split(","));
-  console.log(calories.split(","));
-  console.log(carbs.split(","));
-  console.log(proteins.split(","));
-  console.log(fats.split(","));
-  console.log(addData.split(","));
-  console.log(ins.split(","));
-  console.log(ins.split(" || "));
+  var dishObjs = localStorage.getItem("fullObj");
+  var insObjs = localStorage.getItem("instructions");
+  var ingObjs = localStorage.getItem("ingredients");
+  var addObjs = localStorage.getItem("additional");
+  mainImageEL.setAttribute(
+    "src",
+    JSON.parse(dishObjs.split(" || ")[0]).thumbnail_url
+  );
+  var dishName = document.getElementById("dishName");
+  var cals = document.getElementById("calories");
+  var proteins = document.getElementById("proteins");
+  var fats = document.getElementById("fat");
+  var carbs = document.getElementById("carbs");
+  var additionalInformation = document.getElementById("additionalInformation");
+  dishName.innerHTML =
+    "<b>Name: </b>" + JSON.parse(dishObjs.split(" || ")[0]).name;
+  cals.innerHTML =
+    "<b>Calories: </b>" +
+    JSON.parse(dishObjs.split(" || ")[0]).nutrition.calories +
+    "kcals 🔥";
+  proteins.innerHTML =
+    "<b>Proteins: </b>" +
+    JSON.parse(dishObjs.split(" || ")[0]).nutrition.protein +
+    " g 🥩";
+  fats.innerHTML =
+    "<b>Fats: </b>" +
+    JSON.parse(dishObjs.split(" || ")[0]).nutrition.fat +
+    " g 🥑";
+  carbs.innerHTML =
+    "<b>Carbohydrates: </b>" +
+    JSON.parse(dishObjs.split(" || ")[0]).nutrition.carbohydrates +
+    " g 🥔";
+  additionalInformation.innerHTML = addObjs.split(" || ")[0];
+  ingredientsList.innerHTML = "";
+  console.log(ingObjs.split(" || ")[0])
+  for (var ingredient of ingObjs.split(" || ")[0].split(",")) {
+    var listItem = document.createElement("li");
+    listItem.classList.add("flex");
+    listItem.classList.add("items-start");
+    listItem.innerHTML = `<div class="flex-shrink-0"> <svg class="h-6 w-6 flex-shrink-0 text-green-500" xmlns="http://www.w3.org/2000/svg" fill="none"           viewBox="0 0 24 24"           stroke-width="1.5"           stroke="currentColor"           aria-hidden="true"         >           <path             stroke-linecap="round"             stroke-linejoin="round"             d="M4.5 12.75l6 6 9-13.5"           />         </svg>       </div>       <p class="ml-3 text-base font-medium text-gray-500">         ${ingredient}       </p>`;
+    ingredientsList.append(listItem);
+  }
+
+  instructionsList.innerHTML = "";
+  for (var instruction of insObjs.split(" || ")[0].split(".")) {
+    var listItem = document.createElement("li");
+    if (instruction[0] == ",") {
+      console.log(instruction, "Starts with ,")
+      instruction = instruction.substring(1)
+    }
+    listItem.classList.add("flex");
+    listItem.classList.add("items-start");
+    listItem.innerHTML = `<div class="flex-shrink-0"> <svg class="h-6 w-6 flex-shrink-0 text-green-500" xmlns="http://www.w3.org/2000/svg" fill="none"           viewBox="0 0 24 24"           stroke-width="1.5"           stroke="currentColor"           aria-hidden="true"         >           <path             stroke-linecap="round"             stroke-linejoin="round"             d="M4.5 12.75l6 6 9-13.5"           />         </svg>       </div>       <p class="ml-3 text-base font-medium text-gray-500">         ${instruction}       </p>`;
+    instructionsList.append(listItem);
+  }
 }
 
 function savingRecipie(context, ingredients, instructions) {
-  storeImages.push(context.thumbnail_url);
-  storeNames.push(context.name);
-  storeCalories.push(context.nutrition.calories);
-  storeCarbs.push(context.nutrition.carbohydrates);
-  storeProtein.push(context.nutrition.protein);
-  storeFats.push(context.nutrition.fat);
-  storeAdditonalData.push(context.description);
+  var mainDish = JSON.stringify(context);
+  contexts.push(mainDish + " || ");
+  var dishArr = [...new Set(contexts)];
+  // dishArr = JSON.stringify(dishArr)
+  if (!context.original_video_url) {
+    if (!context.description) {
+      storeAdditonalData.push(
+        "There's no video nor description available for this dish, sorry for the trouble. Have a fun cooking while using ThermoFood App. || "
+      );
+    } else {
+      storeAdditonalData.push(context.description + " || ");
+    }
+  } else {
+    var ifVideo = `<video class="z-10 h-60 w-60 rounded shadow" controls>
+    <source src="${context.original_video_url}" type="video/mp4">
+    <source src="${context.original_video_url}" type="video/ogg">
+  </video> || `;
+    storeAdditonalData.push(ifVideo);
+  }
+
   storeIng.push(ingredients + " || ");
   storeIns.push(instructions + " || ");
-  localStorage.setItem("image", storeImages);
-  localStorage.setItem("name", storeNames);
-  localStorage.setItem("calories", storeCalories);
-  localStorage.setItem("carbs", storeCarbs);
-  localStorage.setItem("proteins", storeProtein);
-  localStorage.setItem("fats", storeFats);
-  localStorage.setItem("additional", storeAdditonalData);
-  localStorage.setItem("ings", storeIng);
-  localStorage.setItem("ins", storeIns);
+  insArr = [...new Set(storeIns)];
+  ingArr = [...new Set(storeIng)];
+  extraArr = [...new Set(storeAdditonalData)];
+  localStorage.setItem("fullObj", dishArr);
+  localStorage.setItem("instructions", insArr);
+  localStorage.setItem("ingredients", ingArr);
+  localStorage.setItem("additional", extraArr);
 }
 
 function gettingDishes(dishes) {
@@ -98,15 +154,12 @@ function gettingDishes(dishes) {
   var instructions = [];
   {
     var dishesIndex = Math.floor(Math.random() * dishes.length);
-    console.log(dishes);
-    console.log(dishesIndex);
     var tag = dishes[dishesIndex];
-    console.log(tag);
 
     const options = {
       method: "GET",
       headers: {
-        "X-RapidAPI-Key": "a1190a5613mshb896d0d8d85cd92p117dddjsn28b788dac426",
+        "X-RapidAPI-Key": "265686aa14mshebe5bed7a41cef2p1b9d66jsnfe7d3bc16121",
         "X-RapidAPI-Host": "tasty.p.rapidapi.com",
       },
     };
@@ -123,7 +176,6 @@ function gettingDishes(dishes) {
         var index = Math.floor(Math.random() * data.results.length);
         console.log(index);
         console.log(data.results);
-        console.log(data.results[index]);
         if (data.results.length === 0) {
           getLocation();
         }
@@ -132,18 +184,10 @@ function gettingDishes(dishes) {
           data.results[index].nutrition === undefined ||
           data.results[index].nutrition.calories === undefined
         ) {
-          console.log(data.results[index]);
-          console.log(index);
           index = Math.floor(Math.random() * data.results.length);
-          console.log(index);
         }
 
-        console.log(data.results[index]);
-        console.log(data.results[index].sections);
-        console.log(data.results[index].nutrition.calories);
-        console.log("components", data.results[index].sections[0].components);
         for (var i = 0; i < data.results[index].sections.length; i++) {
-          console.log("section " + data.results[index].sections[i].name);
           for (
             var j = 0;
             j < data.results[index].sections[i].components.length;
@@ -156,16 +200,9 @@ function gettingDishes(dishes) {
         }
 
         for (var i = 0; i < data.results[index].instructions.length; i++) {
-          console.log(
-            "Instructions " +
-              (i + 1) +
-              ": " +
-              data.results[index].instructions[i].display_text
-          );
           instructions.push(data.results[index].instructions[i].display_text);
         }
-        console.log("Ingredients List:", ingredients);
-        console.log("Instructions:", instructions);
+
         mainImageEL.setAttribute("src", data.results[index].thumbnail_url);
         var dishName = document.getElementById("dishName");
         var cals = document.getElementById("calories");
@@ -204,7 +241,7 @@ function gettingDishes(dishes) {
         }
 
         console.log(data.results[index].name);
-        ingredients.filter(removeValue)
+        ingredients.filter(removeValue);
         ingredientsList.innerHTML = "";
         for (var ingredient of ingredients) {
           var listItem = document.createElement("li");
@@ -214,7 +251,7 @@ function gettingDishes(dishes) {
           ingredientsList.append(listItem);
         }
 
-        instructions.filter(removeValue)
+        instructions.filter(removeValue);
         instructionsList.innerHTML = "";
         for (var instruction of instructions) {
           var listItem = document.createElement("li");
@@ -224,9 +261,14 @@ function gettingDishes(dishes) {
           instructionsList.append(listItem);
         }
         var context = data.results[index];
+        console.log(context);
         likeBtn.addEventListener(
           "click",
-          savingRecipie.bind(null, context, ingredients, instructions)
+          function (event) {
+            savingRecipie(context, ingredients, instructions);
+            event.preventDefault();
+          },
+          false
         );
       });
   }
