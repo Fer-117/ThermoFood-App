@@ -23,6 +23,16 @@ var storeDescriptions = [];
 var storeIng = [];
 var storeIns = [];
 
+function removeValue(value, index, arr) {
+ 
+  if (value == "n/a") {
+
+      arr.splice(index, 1);
+      return true;
+  }
+  return false;
+}
+
 function backToMain() {
   storageBtns.classList.toggle("hidden");
   likeBtn.classList.toggle("hidden");
@@ -48,10 +58,17 @@ function showFavorites() {
   var carbs = localStorage.getItem("carbs");
   var proteins = localStorage.getItem("proteins");
   var fats = localStorage.getItem("fats");
-  var desc = localStorage.getItem("descriptions");
+  var addData = localStorage.getItem("additional");
   var ings = localStorage.getItem("ings");
   var ins = localStorage.getItem("ins");
   console.log(image.split(","));
+  console.log(name.split(","));
+  console.log(calories.split(","));
+  console.log(carbs.split(","));
+  console.log(proteins.split(","));
+  console.log(fats.split(","));
+  console.log(addData.split(","));
+  console.log(ins.split(","));
   console.log(ins.split(" || "));
 }
 
@@ -62,7 +79,7 @@ function savingRecipie(context, ingredients, instructions) {
   storeCarbs.push(context.nutrition.carbohydrates);
   storeProtein.push(context.nutrition.protein);
   storeFats.push(context.nutrition.fat);
-  storeDescriptions.push(context.description);
+  storeAdditonalData.push(context.description);
   storeIng.push(ingredients + " || ");
   storeIns.push(instructions + " || ");
   localStorage.setItem("image", storeImages);
@@ -71,7 +88,7 @@ function savingRecipie(context, ingredients, instructions) {
   localStorage.setItem("carbs", storeCarbs);
   localStorage.setItem("proteins", storeProtein);
   localStorage.setItem("fats", storeFats);
-  localStorage.setItem("descriptions", storeDescriptions);
+  localStorage.setItem("additional", storeAdditonalData);
   localStorage.setItem("ings", storeIng);
   localStorage.setItem("ins", storeIns);
 }
@@ -155,36 +172,39 @@ function gettingDishes(dishes) {
         var proteins = document.getElementById("proteins");
         var fats = document.getElementById("fat");
         var carbs = document.getElementById("carbs");
-        var description = document.getElementById("description");
+        var additionalInformation = document.getElementById(
+          "additionalInformation"
+        );
         dishName.innerHTML = "<b>Name: </b>" + data.results[index].name;
         cals.innerHTML =
           "<b>Calories: </b>" +
           data.results[index].nutrition.calories +
-          "kcals";
+          "kcals 🔥";
         proteins.innerHTML =
-          "<b>Proteins: </b>" + data.results[index].nutrition.protein + " g";
+          "<b>Proteins: </b>" + data.results[index].nutrition.protein + " g 🥩";
         fats.innerHTML =
-          "<b>Fats: </b>" + data.results[index].nutrition.fat + " g";
+          "<b>Fats: </b>" + data.results[index].nutrition.fat + " g 🥑";
         carbs.innerHTML =
           "<b>Carbohydrates: </b>" +
           data.results[index].nutrition.carbohydrates +
-          " g";
+          " g 🥔";
         if (!data.results[index].original_video_url) {
           if (!data.results[index].description) {
-            description.innerHTML =
+            additionalInformation.innerHTML =
               "There's no video nor description available for this dish, sorry for the trouble. Have a fun cooking while using ThermoFood App.";
           } else {
-            description.innerHTML = data.results[index].description;
+            additionalInformation.innerHTML = data.results[index].description;
           }
         } else {
           console.log(data.results[index].original_video_url);
-          description.innerHTML = `<video width="320" height="240" controls>
+          additionalInformation.innerHTML = `<video class="z-10 h-60 w-60 rounded shadow" controls>
           <source src="${data.results[index].original_video_url}" type="video/mp4">
           <source src="${data.results[index].original_video_url}" type="video/ogg">
         </video>`;
         }
 
         console.log(data.results[index].name);
+        ingredients.filter(removeValue)
         ingredientsList.innerHTML = "";
         for (var ingredient of ingredients) {
           var listItem = document.createElement("li");
@@ -194,6 +214,7 @@ function gettingDishes(dishes) {
           ingredientsList.append(listItem);
         }
 
+        instructions.filter(removeValue)
         instructionsList.innerHTML = "";
         for (var instruction of instructions) {
           var listItem = document.createElement("li");
