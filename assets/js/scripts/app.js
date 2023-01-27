@@ -21,7 +21,7 @@ var storeIns = [];
 var contexts = [];
 
 function removeValue(value, index, arr) {
-  if (value == "n/a") {
+  if (value == "n/a//") {
     arr.splice(index, 1);
     return true;
   }
@@ -87,16 +87,25 @@ function nextReceipe() {
     " g 🥔";
   additionalInformation.innerHTML = addObjs.split(" || ")[dishIndex];
   ingredientsList.innerHTML = "";
-  for (var ingredient of ingObjs.split(" || ")[dishIndex].split(",")) {
+  for (var ingredient of ingObjs.split(" || ")[dishIndex].split("//")) {
     var listItem = document.createElement("li");
+    if (ingredient[0] == ",") {
+      console.log(ingredient, "Starts with ,");
+      ingredient = ingredient.substring(1);
+    }
+
+    if (ingredient == "") {
+      return;
+    }
+
     listItem.classList.add("flex");
     listItem.classList.add("items-start");
-    listItem.innerHTML = `<div class="flex-shrink-0"> <svg class="h-6 w-6 flex-shrink-0 text-green-500" xmlns="http://www.w3.org/2000/svg" fill="none"           viewBox="0 0 24 24"           stroke-width="1.5"           stroke="currentColor"           aria-hidden="true"         >           <path             stroke-linecap="round"             stroke-linejoin="round"             d="M4.5 12.75l6 6 9-13.5"           />         </svg>       </div>       <p class="ml-3 text-base font-medium text-gray-500">         ${ingredient}       </p>`;
+    listItem.innerHTML = `<div class="flex-shrink-0"> <svg class="h-6 w-6 flex-shrink-0 text-green-500" xmlns="http://www.w3.org/2000/svg" fill="none"           viewBox="0 0 24 24"           stroke-width="1.5"           stroke="currentColor"           aria-hidden="true"         >           <path             stroke-linecap="round"             stroke-linejoin="round"             d="M4.5 12.75l6 6 9-13.5"           />         </svg>       </div>       <p class="ml-3 text-base font-medium text-gray-500">         ${ingredient}.       </p>`;
     ingredientsList.append(listItem);
   }
 
   instructionsList.innerHTML = "";
-  for (var instruction of insObjs.split(" || ")[dishIndex]) {
+  for (var instruction of insObjs.split(" || ")[dishIndex].split(".")) {
     var listItem = document.createElement("li");
     if (instruction[0] == ",") {
       console.log(instruction, "Starts with ,");
@@ -104,7 +113,7 @@ function nextReceipe() {
     }
     listItem.classList.add("flex");
     listItem.classList.add("items-start");
-    listItem.innerHTML = `<div class="flex-shrink-0"> <svg class="h-6 w-6 flex-shrink-0 text-green-500" xmlns="http://www.w3.org/2000/svg" fill="none"           viewBox="0 0 24 24"           stroke-width="1.5"           stroke="currentColor"           aria-hidden="true"         >           <path             stroke-linecap="round"             stroke-linejoin="round"             d="M4.5 12.75l6 6 9-13.5"           />         </svg>       </div>       <p class="ml-3 text-base font-medium text-gray-500">         ${instruction}       </p>`;
+    listItem.innerHTML = `<div class="flex-shrink-0"> <svg class="h-6 w-6 flex-shrink-0 text-green-500" xmlns="http://www.w3.org/2000/svg" fill="none"           viewBox="0 0 24 24"           stroke-width="1.5"           stroke="currentColor"           aria-hidden="true"         >           <path             stroke-linecap="round"             stroke-linejoin="round"             d="M4.5 12.75l6 6 9-13.5"           />         </svg>       </div>       <p class="ml-3 text-base font-medium text-gray-500">         ${instruction}.       </p>`;
     instructionsList.append(listItem);
   }
 }
@@ -151,11 +160,20 @@ function showFavorites() {
   additionalInformation.innerHTML = addObjs.split(" || ")[0];
   ingredientsList.innerHTML = "";
   console.log(ingObjs.split(" || ")[dishIndex]);
-  for (var ingredient of ingObjs.split(" || ")[dishIndex].split(",")) {
+  for (var ingredient of ingObjs.split(" || ")[dishIndex].split("//")) {
     var listItem = document.createElement("li");
+    if (ingredient[0] == ",") {
+      console.log(ingredient, "Starts with ,");
+      ingredient = ingredient.substring(1);
+    }
+
+    if (ingredient == "") {
+      return;
+    }
+
     listItem.classList.add("flex");
     listItem.classList.add("items-start");
-    listItem.innerHTML = `<div class="flex-shrink-0"> <svg class="h-6 w-6 flex-shrink-0 text-green-500" xmlns="http://www.w3.org/2000/svg" fill="none"           viewBox="0 0 24 24"           stroke-width="1.5"           stroke="currentColor"           aria-hidden="true"         >           <path             stroke-linecap="round"             stroke-linejoin="round"             d="M4.5 12.75l6 6 9-13.5"           />         </svg>       </div>       <p class="ml-3 text-base font-medium text-gray-500">         ${ingredient}       </p>`;
+    listItem.innerHTML = `<div class="flex-shrink-0"> <svg class="h-6 w-6 flex-shrink-0 text-green-500" xmlns="http://www.w3.org/2000/svg" fill="none"           viewBox="0 0 24 24"           stroke-width="1.5"           stroke="currentColor"           aria-hidden="true"         >           <path             stroke-linecap="round"             stroke-linejoin="round"             d="M4.5 12.75l6 6 9-13.5"           />         </svg>       </div>       <p class="ml-3 text-base font-medium text-gray-500">         ${ingredient}.       </p>`;
     ingredientsList.append(listItem);
   }
 
@@ -168,7 +186,7 @@ function showFavorites() {
     }
     listItem.classList.add("flex");
     listItem.classList.add("items-start");
-    listItem.innerHTML = `<div class="flex-shrink-0"> <svg class="h-6 w-6 flex-shrink-0 text-green-500" xmlns="http://www.w3.org/2000/svg" fill="none"           viewBox="0 0 24 24"           stroke-width="1.5"           stroke="currentColor"           aria-hidden="true"         >           <path             stroke-linecap="round"             stroke-linejoin="round"             d="M4.5 12.75l6 6 9-13.5"           />         </svg>       </div>       <p class="ml-3 text-base font-medium text-gray-500">         ${instruction}       </p>`;
+    listItem.innerHTML = `<div class="flex-shrink-0"> <svg class="h-6 w-6 flex-shrink-0 text-green-500" xmlns="http://www.w3.org/2000/svg" fill="none"           viewBox="0 0 24 24"           stroke-width="1.5"           stroke="currentColor"           aria-hidden="true"         >           <path             stroke-linecap="round"             stroke-linejoin="round"             d="M4.5 12.75l6 6 9-13.5"           />         </svg>       </div>       <p class="ml-3 text-base font-medium text-gray-500">         ${instruction}.       </p>`;
     instructionsList.append(listItem);
   }
 }
@@ -263,7 +281,7 @@ function gettingDishes(dishes) {
             j++
           ) {
             ingredients.push(
-              data.results[index].sections[i].components[j].raw_text
+              data.results[index].sections[i].components[j].raw_text + "//"
             );
           }
         }
@@ -314,6 +332,7 @@ function gettingDishes(dishes) {
         ingredientsList.innerHTML = "";
         for (var ingredient of ingredients) {
           var listItem = document.createElement("li");
+          ingredient = ingredient.replace("//", ".");
           listItem.classList.add("flex");
           listItem.classList.add("items-start");
           listItem.innerHTML = `<div class="flex-shrink-0"> <svg class="h-6 w-6 flex-shrink-0 text-green-500" xmlns="http://www.w3.org/2000/svg" fill="none"           viewBox="0 0 24 24"           stroke-width="1.5"           stroke="currentColor"           aria-hidden="true"         >           <path             stroke-linecap="round"             stroke-linejoin="round"             d="M4.5 12.75l6 6 9-13.5"           />         </svg>       </div>       <p class="ml-3 text-base font-medium text-gray-500">         ${ingredient}       </p>`;
