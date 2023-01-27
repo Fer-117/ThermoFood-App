@@ -12,6 +12,8 @@ var back2App = document.getElementById("back2App");
 var mainImageEL = document.getElementById("mainImage");
 var storageBtns = document.getElementById("storageBtns");
 var resetBtn = document.getElementById("reset");
+var nextBtn = document.getElementById("next");
+var dishIndex = 0;
 
 var storeAdditonalData = [];
 var storeIng = [];
@@ -43,6 +45,70 @@ function resetStorage() {
   localStorage.clear();
 }
 
+function nextReceipe() {
+  var clean;
+  var dishObjs = localStorage.getItem("fullObj");
+  var insObjs = localStorage.getItem("instructions");
+  var ingObjs = localStorage.getItem("ingredients");
+  var addObjs = localStorage.getItem("additional");
+  console.log(dishObjs.split(" || ").length);
+
+  dishIndex++;
+  if (dishIndex === addObjs.split(" || ").length - 1) {
+    dishIndex = 0;
+  }
+  if (dishObjs.split(" || ")[dishIndex][0] == ",") {
+    console.log("Starts with ,");
+    clean = dishObjs.split(" || ")[dishIndex].substring(1);
+    console.log(JSON.parse(clean));
+  } else {
+    clean = dishObjs.split(" || ")[dishIndex];
+    console.log(JSON.parse(clean));
+  }
+  console.log(addObjs.split(" || ")[dishIndex]);
+  console.log(ingObjs.split(" || ")[dishIndex]);
+  console.log(insObjs.split(" || ")[dishIndex]);
+  mainImageEL.setAttribute("src", JSON.parse(clean).thumbnail_url);
+  var dishName = document.getElementById("dishName");
+  var cals = document.getElementById("calories");
+  var proteins = document.getElementById("proteins");
+  var fats = document.getElementById("fat");
+  var carbs = document.getElementById("carbs");
+  var additionalInformation = document.getElementById("additionalInformation");
+  dishName.innerHTML = "<b>Name: </b>" + JSON.parse(clean).name;
+  cals.innerHTML =
+    "<b>Calories: </b>" + JSON.parse(clean).nutrition.calories + "kcals 🔥";
+  proteins.innerHTML =
+    "<b>Proteins: </b>" + JSON.parse(clean).nutrition.protein + " g 🥩";
+  fats.innerHTML = "<b>Fats: </b>" + JSON.parse(clean).nutrition.fat + " g 🥑";
+  carbs.innerHTML =
+    "<b>Carbohydrates: </b>" +
+    JSON.parse(clean).nutrition.carbohydrates +
+    " g 🥔";
+  additionalInformation.innerHTML = addObjs.split(" || ")[dishIndex];
+  ingredientsList.innerHTML = "";
+  for (var ingredient of ingObjs.split(" || ")[dishIndex].split(",")) {
+    var listItem = document.createElement("li");
+    listItem.classList.add("flex");
+    listItem.classList.add("items-start");
+    listItem.innerHTML = `<div class="flex-shrink-0"> <svg class="h-6 w-6 flex-shrink-0 text-green-500" xmlns="http://www.w3.org/2000/svg" fill="none"           viewBox="0 0 24 24"           stroke-width="1.5"           stroke="currentColor"           aria-hidden="true"         >           <path             stroke-linecap="round"             stroke-linejoin="round"             d="M4.5 12.75l6 6 9-13.5"           />         </svg>       </div>       <p class="ml-3 text-base font-medium text-gray-500">         ${ingredient}       </p>`;
+    ingredientsList.append(listItem);
+  }
+
+  instructionsList.innerHTML = "";
+  for (var instruction of insObjs.split(" || ")[dishIndex]) {
+    var listItem = document.createElement("li");
+    if (instruction[0] == ",") {
+      console.log(instruction, "Starts with ,");
+      instruction = instruction.substring(1);
+    }
+    listItem.classList.add("flex");
+    listItem.classList.add("items-start");
+    listItem.innerHTML = `<div class="flex-shrink-0"> <svg class="h-6 w-6 flex-shrink-0 text-green-500" xmlns="http://www.w3.org/2000/svg" fill="none"           viewBox="0 0 24 24"           stroke-width="1.5"           stroke="currentColor"           aria-hidden="true"         >           <path             stroke-linecap="round"             stroke-linejoin="round"             d="M4.5 12.75l6 6 9-13.5"           />         </svg>       </div>       <p class="ml-3 text-base font-medium text-gray-500">         ${instruction}       </p>`;
+    instructionsList.append(listItem);
+  }
+}
+
 function showFavorites() {
   storageBtns.classList.toggle("hidden");
   likeBtn.classList.toggle("hidden");
@@ -53,10 +119,7 @@ function showFavorites() {
   var insObjs = localStorage.getItem("instructions");
   var ingObjs = localStorage.getItem("ingredients");
   var addObjs = localStorage.getItem("additional");
-  console.log("LEN: ", dishObjs.split(" || ").length)
 
-  console.log(JSON.parse(dishObjs.split(" || ")[0]))
-  console.log(JSON.parse(dishObjs.split(" || ")[3]))
   mainImageEL.setAttribute(
     "src",
     JSON.parse(dishObjs.split(" || ")[0]).thumbnail_url
@@ -87,8 +150,8 @@ function showFavorites() {
     " g 🥔";
   additionalInformation.innerHTML = addObjs.split(" || ")[0];
   ingredientsList.innerHTML = "";
-  console.log(ingObjs.split(" || ")[0]);
-  for (var ingredient of ingObjs.split(" || ")[0].split(",")) {
+  console.log(ingObjs.split(" || ")[dishIndex]);
+  for (var ingredient of ingObjs.split(" || ")[dishIndex].split(",")) {
     var listItem = document.createElement("li");
     listItem.classList.add("flex");
     listItem.classList.add("items-start");
@@ -111,16 +174,16 @@ function showFavorites() {
 }
 
 function savingRecipie(context, ingredients, instructions) {
-  console.log(localStorage.getItem("fullObj"))
+  console.log(localStorage.getItem("fullObj"));
   if (localStorage.getItem("fullObj")) {
     storeAdditonalData = [];
     storeIng = [];
     storeIns = [];
     contexts = [];
-    console.log("Storage has something")
+    console.log("Storage has something");
     storeAdditonalData.push(localStorage.getItem("additional"));
     storeIng.push(localStorage.getItem("ingredients"));
-    storeIns.push(localStorage.getItem("additional"));
+    storeIns.push(localStorage.getItem("instructions"));
     contexts.push(localStorage.getItem("fullObj"));
   }
 
@@ -363,3 +426,4 @@ insCloseModal.addEventListener("click", showInstructionsHandler);
 urRecipies.addEventListener("click", showFavorites);
 back2App.addEventListener("click", backToMain);
 resetBtn.addEventListener("click", resetStorage);
+nextBtn.addEventListener("click", nextReceipe);
