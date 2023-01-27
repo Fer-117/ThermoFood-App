@@ -13,6 +13,8 @@ var mainImageEL = document.getElementById("mainImage");
 var storageBtns = document.getElementById("storageBtns");
 var resetBtn = document.getElementById("reset");
 var nextBtn = document.getElementById("next");
+var noStorageBtn = document.getElementsByClassName("noReceipes");
+var sideTitles = document.getElementsByClassName("sideTitles")
 var dishIndex = 0;
 
 var storeAdditonalData = [];
@@ -38,6 +40,24 @@ function backToMain() {
 }
 
 function resetStorage() {
+  var dishName = document.getElementById("dishName");
+  var cals = document.getElementById("calories");
+  var proteins = document.getElementById("proteins");
+  var fats = document.getElementById("fat");
+  var carbs = document.getElementById("carbs");
+  var additionalInformation = document.getElementById("additionalInformation");
+  noStorageBtn[0].classList.toggle("hidden");
+  noStorageBtn[1].classList.toggle("hidden");
+  noStorageBtn[2].classList.toggle("hidden");
+  mainImageEL.setAttribute("src","assets/images/noFood.png");
+  sideTitles[0].classList.toggle("hidden");
+  sideTitles[1].classList.toggle("hidden");
+  dishName.classList.toggle("hidden");
+  cals.classList.toggle("hidden");
+  proteins.classList.toggle("hidden");
+  fats.classList.toggle("hidden");
+  carbs.classList.toggle("hidden");
+  additionalInformation.classList.toggle("hidden");
   storeAdditonalData = [];
   storeIng = [];
   storeIns = [];
@@ -85,8 +105,19 @@ function nextReceipe() {
     "<b>Carbohydrates: </b>" +
     JSON.parse(clean).nutrition.carbohydrates +
     " g 🥔";
-  additionalInformation.innerHTML = addObjs.split(" || ")[dishIndex];
+
+  if (addObjs.split(" || ")[dishIndex][0] == ",") {
+    console.log(addObjs.split(" || ")[dishIndex], "Starts with ,");
+    var extraInfo = addObjs.split(" || ")[dishIndex].substring(1);
+    console.log(addObjs.split(" || ")[dishIndex][0]);
+    console.log(extraInfo);
+    additionalInformation.innerHTML = extraInfo;
+  } else {
+    additionalInformation.innerHTML = addObjs.split(" || ")[dishIndex];
+  }
+
   ingredientsList.innerHTML = "";
+
   for (var ingredient of ingObjs.split(" || ")[dishIndex].split("//")) {
     var listItem = document.createElement("li");
     if (ingredient[0] == ",") {
@@ -94,8 +125,8 @@ function nextReceipe() {
       ingredient = ingredient.substring(1);
     }
 
-    if (ingredient == "") {
-      return;
+    if (ingredient === "") {
+      continue;
     }
 
     listItem.classList.add("flex");
@@ -103,7 +134,7 @@ function nextReceipe() {
     listItem.innerHTML = `<div class="flex-shrink-0"> <svg class="h-6 w-6 flex-shrink-0 text-green-500" xmlns="http://www.w3.org/2000/svg" fill="none"           viewBox="0 0 24 24"           stroke-width="1.5"           stroke="currentColor"           aria-hidden="true"         >           <path             stroke-linecap="round"             stroke-linejoin="round"             d="M4.5 12.75l6 6 9-13.5"           />         </svg>       </div>       <p class="ml-3 text-base font-medium text-gray-500">         ${ingredient}.       </p>`;
     ingredientsList.append(listItem);
   }
-
+  console.log(insObjs.split(" || ")[dishIndex].split("."));
   instructionsList.innerHTML = "";
   for (var instruction of insObjs.split(" || ")[dishIndex].split(".")) {
     var listItem = document.createElement("li");
@@ -157,7 +188,14 @@ function showFavorites() {
     "<b>Carbohydrates: </b>" +
     JSON.parse(dishObjs.split(" || ")[0]).nutrition.carbohydrates +
     " g 🥔";
-  additionalInformation.innerHTML = addObjs.split(" || ")[0];
+
+  if (addObjs.split(" || ")[0][0] == ",") {
+    console.log(addObjs.split(" || ")[0][0], "Starts with ,");
+    var extraInfo = addObjs.split(" || ")[0].substring(1);
+    additionalInformation.innerHTML = extraInfo;
+  } else {
+    additionalInformation.innerHTML = addObjs.split(" || ")[0];
+  }
   ingredientsList.innerHTML = "";
   console.log(ingObjs.split(" || ")[dishIndex]);
   for (var ingredient of ingObjs.split(" || ")[dishIndex].split("//")) {
@@ -167,8 +205,8 @@ function showFavorites() {
       ingredient = ingredient.substring(1);
     }
 
-    if (ingredient == "") {
-      return;
+    if (ingredient === "") {
+      continue;
     }
 
     listItem.classList.add("flex");
@@ -177,13 +215,16 @@ function showFavorites() {
     ingredientsList.append(listItem);
   }
 
+  console.log(insObjs.split(" || ")[0].split("."))
   instructionsList.innerHTML = "";
   for (var instruction of insObjs.split(" || ")[0].split(".")) {
+    console.log(instruction);
     var listItem = document.createElement("li");
     if (instruction[0] == ",") {
       console.log(instruction, "Starts with ,");
       instruction = instruction.substring(1);
     }
+    console.log("LI");
     listItem.classList.add("flex");
     listItem.classList.add("items-start");
     listItem.innerHTML = `<div class="flex-shrink-0"> <svg class="h-6 w-6 flex-shrink-0 text-green-500" xmlns="http://www.w3.org/2000/svg" fill="none"           viewBox="0 0 24 24"           stroke-width="1.5"           stroke="currentColor"           aria-hidden="true"         >           <path             stroke-linecap="round"             stroke-linejoin="round"             d="M4.5 12.75l6 6 9-13.5"           />         </svg>       </div>       <p class="ml-3 text-base font-medium text-gray-500">         ${instruction}.       </p>`;
