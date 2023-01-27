@@ -13,8 +13,9 @@ var mainImageEL = document.getElementById("mainImage");
 var storageBtns = document.getElementById("storageBtns");
 var resetBtn = document.getElementById("reset");
 var nextBtn = document.getElementById("next");
+var prevBtn = document.getElementById("prev")
 var noStorageBtn = document.getElementsByClassName("noReceipes");
-var sideTitles = document.getElementsByClassName("sideTitles")
+var sideTitles = document.getElementsByClassName("sideTitles");
 var dishIndex = 0;
 
 var storeAdditonalData = [];
@@ -39,7 +40,7 @@ function backToMain() {
   getLocation();
 }
 
-function resetStorage() {
+function noFoodSaved() {
   var dishName = document.getElementById("dishName");
   var cals = document.getElementById("calories");
   var proteins = document.getElementById("proteins");
@@ -49,7 +50,7 @@ function resetStorage() {
   noStorageBtn[0].classList.toggle("hidden");
   noStorageBtn[1].classList.toggle("hidden");
   noStorageBtn[2].classList.toggle("hidden");
-  mainImageEL.setAttribute("src","assets/images/noFood.png");
+  mainImageEL.setAttribute("src", "assets/images/noFood.png");
   sideTitles[0].classList.toggle("hidden");
   sideTitles[1].classList.toggle("hidden");
   dishName.classList.toggle("hidden");
@@ -58,11 +59,99 @@ function resetStorage() {
   fats.classList.toggle("hidden");
   carbs.classList.toggle("hidden");
   additionalInformation.classList.toggle("hidden");
+}
+
+function resetStorage() {
+  noFoodSaved();
   storeAdditonalData = [];
   storeIng = [];
   storeIns = [];
   contexts = [];
   localStorage.clear();
+}
+
+function previousReceipe() {
+  var clean;
+  var dishObjs = localStorage.getItem("fullObj");
+  var insObjs = localStorage.getItem("instructions");
+  var ingObjs = localStorage.getItem("ingredients");
+  var addObjs = localStorage.getItem("additional");
+  console.log(dishObjs.split(" || ").length);
+
+  dishIndex--;
+  if (dishIndex < 0) {
+    dishIndex = addObjs.split(" || ").length - 1;
+  }
+  if (dishObjs.split(" || ")[dishIndex][0] == ",") {
+    console.log("Starts with ,");
+    clean = dishObjs.split(" || ")[dishIndex].substring(1);
+    console.log(JSON.parse(clean));
+  } else {
+    clean = dishObjs.split(" || ")[dishIndex];
+    console.log(JSON.parse(clean));
+  }
+  console.log(addObjs.split(" || ")[dishIndex]);
+  console.log(ingObjs.split(" || ")[dishIndex]);
+  console.log(insObjs.split(" || ")[dishIndex]);
+  mainImageEL.setAttribute("src", JSON.parse(clean).thumbnail_url);
+  var dishName = document.getElementById("dishName");
+  var cals = document.getElementById("calories");
+  var proteins = document.getElementById("proteins");
+  var fats = document.getElementById("fat");
+  var carbs = document.getElementById("carbs");
+  var additionalInformation = document.getElementById("additionalInformation");
+  dishName.innerHTML = "<b>Name: </b>" + JSON.parse(clean).name;
+  cals.innerHTML =
+    "<b>Calories: </b>" + JSON.parse(clean).nutrition.calories + "kcals 🔥";
+  proteins.innerHTML =
+    "<b>Proteins: </b>" + JSON.parse(clean).nutrition.protein + " g 🥩";
+  fats.innerHTML = "<b>Fats: </b>" + JSON.parse(clean).nutrition.fat + " g 🥑";
+  carbs.innerHTML =
+    "<b>Carbohydrates: </b>" +
+    JSON.parse(clean).nutrition.carbohydrates +
+    " g 🥔";
+
+  if (addObjs.split(" || ")[dishIndex][0] == ",") {
+    console.log(addObjs.split(" || ")[dishIndex], "Starts with ,");
+    var extraInfo = addObjs.split(" || ")[dishIndex].substring(1);
+    console.log(addObjs.split(" || ")[dishIndex][0]);
+    console.log(extraInfo);
+    additionalInformation.innerHTML = extraInfo;
+  } else {
+    additionalInformation.innerHTML = addObjs.split(" || ")[dishIndex];
+  }
+
+  ingredientsList.innerHTML = "";
+
+  for (var ingredient of ingObjs.split(" || ")[dishIndex].split("//")) {
+    var listItem = document.createElement("li");
+    if (ingredient[0] == ",") {
+      console.log(ingredient, "Starts with ,");
+      ingredient = ingredient.substring(1);
+    }
+
+    if (ingredient === "") {
+      continue;
+    }
+
+    listItem.classList.add("flex");
+    listItem.classList.add("items-start");
+    listItem.innerHTML = `<div class="flex-shrink-0"> <svg class="h-6 w-6 flex-shrink-0 text-green-500" xmlns="http://www.w3.org/2000/svg" fill="none"           viewBox="0 0 24 24"           stroke-width="1.5"           stroke="currentColor"           aria-hidden="true"         >           <path             stroke-linecap="round"             stroke-linejoin="round"             d="M4.5 12.75l6 6 9-13.5"           />         </svg>       </div>       <p class="ml-3 text-base font-medium text-gray-500">         ${ingredient}.       </p>`;
+    ingredientsList.append(listItem);
+  }
+  console.log(insObjs.split(" || ")[dishIndex].split("."));
+  instructionsList.innerHTML = "";
+  for (var instruction of insObjs.split(" || ")[dishIndex].split(".")) {
+    var listItem = document.createElement("li");
+    if (instruction[0] == ",") {
+      console.log(instruction, "Starts with ,");
+      instruction = instruction.substring(1);
+    }
+    listItem.classList.add("flex");
+    listItem.classList.add("items-start");
+    listItem.innerHTML = `<div class="flex-shrink-0"> <svg class="h-6 w-6 flex-shrink-0 text-green-500" xmlns="http://www.w3.org/2000/svg" fill="none"           viewBox="0 0 24 24"           stroke-width="1.5"           stroke="currentColor"           aria-hidden="true"         >           <path             stroke-linecap="round"             stroke-linejoin="round"             d="M4.5 12.75l6 6 9-13.5"           />         </svg>       </div>       <p class="ml-3 text-base font-medium text-gray-500">         ${instruction}.       </p>`;
+    instructionsList.append(listItem);
+  }
 }
 
 function nextReceipe() {
@@ -150,90 +239,99 @@ function nextReceipe() {
 }
 
 function showFavorites() {
-  storageBtns.classList.toggle("hidden");
-  likeBtn.classList.toggle("hidden");
-  dislikeBtn.classList.toggle("hidden");
-  back2App.classList.toggle("hidden");
-  urRecipies.classList.toggle("hidden");
-  var dishObjs = localStorage.getItem("fullObj");
-  var insObjs = localStorage.getItem("instructions");
-  var ingObjs = localStorage.getItem("ingredients");
-  var addObjs = localStorage.getItem("additional");
-
-  mainImageEL.setAttribute(
-    "src",
-    JSON.parse(dishObjs.split(" || ")[0]).thumbnail_url
-  );
-  var dishName = document.getElementById("dishName");
-  var cals = document.getElementById("calories");
-  var proteins = document.getElementById("proteins");
-  var fats = document.getElementById("fat");
-  var carbs = document.getElementById("carbs");
-  var additionalInformation = document.getElementById("additionalInformation");
-  dishName.innerHTML =
-    "<b>Name: </b>" + JSON.parse(dishObjs.split(" || ")[0]).name;
-  cals.innerHTML =
-    "<b>Calories: </b>" +
-    JSON.parse(dishObjs.split(" || ")[0]).nutrition.calories +
-    "kcals 🔥";
-  proteins.innerHTML =
-    "<b>Proteins: </b>" +
-    JSON.parse(dishObjs.split(" || ")[0]).nutrition.protein +
-    " g 🥩";
-  fats.innerHTML =
-    "<b>Fats: </b>" +
-    JSON.parse(dishObjs.split(" || ")[0]).nutrition.fat +
-    " g 🥑";
-  carbs.innerHTML =
-    "<b>Carbohydrates: </b>" +
-    JSON.parse(dishObjs.split(" || ")[0]).nutrition.carbohydrates +
-    " g 🥔";
-
-  if (addObjs.split(" || ")[0][0] == ",") {
-    console.log(addObjs.split(" || ")[0][0], "Starts with ,");
-    var extraInfo = addObjs.split(" || ")[0].substring(1);
-    additionalInformation.innerHTML = extraInfo;
+  if (!localStorage.getItem("fullObj")) {
+    noFoodSaved();
+    storageBtns.classList.toggle("hidden");
+    likeBtn.classList.toggle("hidden");
+    dislikeBtn.classList.toggle("hidden");
+    back2App.classList.toggle("hidden");
+    urRecipies.classList.toggle("hidden");
   } else {
-    additionalInformation.innerHTML = addObjs.split(" || ")[0];
-  }
-  ingredientsList.innerHTML = "";
-  console.log(ingObjs.split(" || ")[dishIndex]);
-  for (var ingredient of ingObjs.split(" || ")[dishIndex].split("//")) {
-    var listItem = document.createElement("li");
-    if (ingredient[0] == ",") {
-      console.log(ingredient, "Starts with ,");
-      ingredient = ingredient.substring(1);
+    storageBtns.classList.toggle("hidden");
+    likeBtn.classList.toggle("hidden");
+    dislikeBtn.classList.toggle("hidden");
+    back2App.classList.toggle("hidden");
+    urRecipies.classList.toggle("hidden");
+    var dishObjs = localStorage.getItem("fullObj");
+    var insObjs = localStorage.getItem("instructions");
+    var ingObjs = localStorage.getItem("ingredients");
+    var addObjs = localStorage.getItem("additional");
+    console.log(dishObjs.split(" || ").length);
+    console.log(insObjs.split(" || ").length);
+    mainImageEL.setAttribute(
+      "src",
+      JSON.parse(dishObjs.split(" || ")[0]).thumbnail_url
+    );
+    var dishName = document.getElementById("dishName");
+    var cals = document.getElementById("calories");
+    var proteins = document.getElementById("proteins");
+    var fats = document.getElementById("fat");
+    var carbs = document.getElementById("carbs");
+    var additionalInformation = document.getElementById(
+      "additionalInformation"
+    );
+    dishName.innerHTML =
+      "<b>Name: </b>" + JSON.parse(dishObjs.split(" || ")[0]).name;
+    cals.innerHTML =
+      "<b>Calories: </b>" +
+      JSON.parse(dishObjs.split(" || ")[0]).nutrition.calories +
+      "kcals 🔥";
+    proteins.innerHTML =
+      "<b>Proteins: </b>" +
+      JSON.parse(dishObjs.split(" || ")[0]).nutrition.protein +
+      " g 🥩";
+    fats.innerHTML =
+      "<b>Fats: </b>" +
+      JSON.parse(dishObjs.split(" || ")[0]).nutrition.fat +
+      " g 🥑";
+    carbs.innerHTML =
+      "<b>Carbohydrates: </b>" +
+      JSON.parse(dishObjs.split(" || ")[0]).nutrition.carbohydrates +
+      " g 🥔";
+
+    if (addObjs.split(" || ")[0][0] == ",") {
+      console.log(addObjs.split(" || ")[0][0], "Starts with ,");
+      var extraInfo = addObjs.split(" || ")[0].substring(1);
+      additionalInformation.innerHTML = extraInfo;
+    } else {
+      additionalInformation.innerHTML = addObjs.split(" || ")[0];
+    }
+    ingredientsList.innerHTML = "";
+    console.log(ingObjs.split(" || ")[dishIndex]);
+    for (var ingredient of ingObjs.split(" || ")[dishIndex].split("//")) {
+      var listItem = document.createElement("li");
+      if (ingredient[0] == ",") {
+        console.log(ingredient, "Starts with ,");
+        ingredient = ingredient.substring(1);
+      }
+
+      if (ingredient === "") {
+        continue;
+      }
+
+      listItem.classList.add("flex");
+      listItem.classList.add("items-start");
+      listItem.innerHTML = `<div class="flex-shrink-0"> <svg class="h-6 w-6 flex-shrink-0 text-green-500" xmlns="http://www.w3.org/2000/svg" fill="none"           viewBox="0 0 24 24"           stroke-width="1.5"           stroke="currentColor"           aria-hidden="true"         >           <path             stroke-linecap="round"             stroke-linejoin="round"             d="M4.5 12.75l6 6 9-13.5"           />         </svg>       </div>       <p class="ml-3 text-base font-medium text-gray-500">         ${ingredient}.       </p>`;
+      ingredientsList.append(listItem);
     }
 
-    if (ingredient === "") {
-      continue;
-    }
+    console.log(insObjs.split(" || ")[0].split("."));
+    instructionsList.innerHTML = "";
+    for (var instruction of insObjs.split(" || ")[0].split(".")) {
 
-    listItem.classList.add("flex");
-    listItem.classList.add("items-start");
-    listItem.innerHTML = `<div class="flex-shrink-0"> <svg class="h-6 w-6 flex-shrink-0 text-green-500" xmlns="http://www.w3.org/2000/svg" fill="none"           viewBox="0 0 24 24"           stroke-width="1.5"           stroke="currentColor"           aria-hidden="true"         >           <path             stroke-linecap="round"             stroke-linejoin="round"             d="M4.5 12.75l6 6 9-13.5"           />         </svg>       </div>       <p class="ml-3 text-base font-medium text-gray-500">         ${ingredient}.       </p>`;
-    ingredientsList.append(listItem);
-  }
-
-  console.log(insObjs.split(" || ")[0].split("."))
-  instructionsList.innerHTML = "";
-  for (var instruction of insObjs.split(" || ")[0].split(".")) {
-    console.log(instruction);
-    var listItem = document.createElement("li");
-    if (instruction[0] == ",") {
-      console.log(instruction, "Starts with ,");
-      instruction = instruction.substring(1);
+      var listItem = document.createElement("li");
+      if (instruction[0] == ",") {
+        instruction = instruction.substring(1);
+      }
+      listItem.classList.add("flex");
+      listItem.classList.add("items-start");
+      listItem.innerHTML = `<div class="flex-shrink-0"> <svg class="h-6 w-6 flex-shrink-0 text-green-500" xmlns="http://www.w3.org/2000/svg" fill="none"           viewBox="0 0 24 24"           stroke-width="1.5"           stroke="currentColor"           aria-hidden="true"         >           <path             stroke-linecap="round"             stroke-linejoin="round"             d="M4.5 12.75l6 6 9-13.5"           />         </svg>       </div>       <p class="ml-3 text-base font-medium text-gray-500">         ${instruction}.       </p>`;
+      instructionsList.append(listItem);
     }
-    console.log("LI");
-    listItem.classList.add("flex");
-    listItem.classList.add("items-start");
-    listItem.innerHTML = `<div class="flex-shrink-0"> <svg class="h-6 w-6 flex-shrink-0 text-green-500" xmlns="http://www.w3.org/2000/svg" fill="none"           viewBox="0 0 24 24"           stroke-width="1.5"           stroke="currentColor"           aria-hidden="true"         >           <path             stroke-linecap="round"             stroke-linejoin="round"             d="M4.5 12.75l6 6 9-13.5"           />         </svg>       </div>       <p class="ml-3 text-base font-medium text-gray-500">         ${instruction}.       </p>`;
-    instructionsList.append(listItem);
   }
 }
 
 function savingRecipie(context, ingredients, instructions) {
-  console.log(localStorage.getItem("fullObj"));
   if (localStorage.getItem("fullObj")) {
     storeAdditonalData = [];
     storeIng = [];
@@ -340,6 +438,18 @@ function gettingDishes(dishes) {
         var additionalInformation = document.getElementById(
           "additionalInformation"
         );
+        noStorageBtn[0].classList.add("hidden");
+        noStorageBtn[1].classList.add("hidden");
+        noStorageBtn[2].classList.add("hidden");
+        sideTitles[0].classList.remove("hidden");
+        sideTitles[1].classList.remove("hidden");
+        dishName.classList.remove("hidden");
+        cals.classList.remove("hidden");
+        proteins.classList.remove("hidden");
+        fats.classList.remove("hidden");
+        carbs.classList.remove("hidden");
+        additionalInformation.classList.remove("hidden");
+
         dishName.innerHTML = "<b>Name: </b>" + data.results[index].name;
         cals.innerHTML =
           "<b>Calories: </b>" +
@@ -487,3 +597,4 @@ urRecipies.addEventListener("click", showFavorites);
 back2App.addEventListener("click", backToMain);
 resetBtn.addEventListener("click", resetStorage);
 nextBtn.addEventListener("click", nextReceipe);
+prevBtn.addEventListener("click", previousReceipe)
