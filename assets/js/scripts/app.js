@@ -499,6 +499,8 @@ function gettingDishes(dishes) {
           listItem.innerHTML = `<div class="flex-shrink-0"> <svg class="h-6 w-6 flex-shrink-0 text-green-500" xmlns="http://www.w3.org/2000/svg" fill="none"           viewBox="0 0 24 24"           stroke-width="1.5"           stroke="currentColor"           aria-hidden="true"         >           <path             stroke-linecap="round"             stroke-linejoin="round"             d="M4.5 12.75l6 6 9-13.5"           />         </svg>       </div>       <p class="ml-3 text-base font-medium text-gray-500">         ${instruction}       </p>`;
           instructionsList.append(listItem);
         }
+        urRecipies.disabled = false;
+        urRecipies.classList.remove("cursor-not-allowed")
         var context = data.results[index];
         console.log(context);
         likeBtn.addEventListener(
@@ -524,6 +526,8 @@ function showInstructionsHandler() {
 }
 
 function getLocation() {
+  urRecipies.disabled = true;
+  urRecipies.classList.add("cursor-not-allowed")
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(getApi, denyLocation);
   } else {
