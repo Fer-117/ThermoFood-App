@@ -290,18 +290,15 @@ function showFavorites() {
       " g 🥔";
 
     if (addObjs.split(" || ")[0][0] == ",") {
-      console.log(addObjs.split(" || ")[0][0], "Starts with ,");
       var extraInfo = addObjs.split(" || ")[0].substring(1);
       additionalInformation.innerHTML = extraInfo;
     } else {
       additionalInformation.innerHTML = addObjs.split(" || ")[0];
     }
     ingredientsList.innerHTML = "";
-    console.log(ingObjs.split(" || ")[dishIndex]);
     for (var ingredient of ingObjs.split(" || ")[dishIndex].split("//")) {
       var listItem = document.createElement("li");
       if (ingredient[0] == ",") {
-        console.log(ingredient, "Starts with ,");
         ingredient = ingredient.substring(1);
       }
 
@@ -526,8 +523,8 @@ function showInstructionsHandler() {
 }
 
 function getLocation() {
-  urRecipies.disabled = true;
-  urRecipies.classList.add("cursor-not-allowed")
+  // urRecipies.disabled = true;
+  // urRecipies.classList.add("cursor-not-allowed")
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(getApi, denyLocation);
   } else {
