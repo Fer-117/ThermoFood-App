@@ -13,7 +13,7 @@ var mainImageEL = document.getElementById("mainImage");
 var storageBtns = document.getElementById("storageBtns");
 var resetBtn = document.getElementById("reset");
 var nextBtn = document.getElementById("next");
-var prevBtn = document.getElementById("prev")
+var prevBtn = document.getElementById("prev");
 var noStorageBtn = document.getElementsByClassName("noReceipes");
 var sideTitles = document.getElementsByClassName("sideTitles");
 var dishIndex = 0;
@@ -160,8 +160,13 @@ function nextReceipe() {
   var insObjs = localStorage.getItem("instructions");
   var ingObjs = localStorage.getItem("ingredients");
   var addObjs = localStorage.getItem("additional");
+  console.log(dishObjs.split(" || "));
   console.log(dishObjs.split(" || ").length);
+  var dishSet = [...new Set(dishObjs.split(" || "))];
+  console.log(dishSet);
+  console.log(dishSet.length);
 
+  console.log(dishIndex);
   dishIndex++;
   if (dishIndex === addObjs.split(" || ").length - 1) {
     dishIndex = 0;
@@ -193,7 +198,7 @@ function nextReceipe() {
   carbs.innerHTML =
     "<b>Carbohydrates: </b>" +
     JSON.parse(clean).nutrition.carbohydrates +
-    " g 🥔";
+    " g 🥔"; 
 
   if (addObjs.split(" || ")[dishIndex][0] == ",") {
     console.log(addObjs.split(" || ")[dishIndex], "Starts with ,");
@@ -315,7 +320,6 @@ function showFavorites() {
     console.log(insObjs.split(" || ")[0].split("."));
     instructionsList.innerHTML = "";
     for (var instruction of insObjs.split(" || ")[0].split(".")) {
-
       var listItem = document.createElement("li");
       if (instruction[0] == ",") {
         instruction = instruction.substring(1);
@@ -366,6 +370,9 @@ function savingRecipie(context, ingredients, instructions) {
   insArr = [...new Set(storeIns)];
   ingArr = [...new Set(storeIng)];
   extraArr = [...new Set(storeAdditonalData)];
+  for (var i = 0; i < dishArr.length; i++) {
+    console.log(JSON.parse(dishArr[i].split(" || ")[0]).name)
+  }
   localStorage.setItem("fullObj", dishArr);
   localStorage.setItem("instructions", insArr);
   localStorage.setItem("ingredients", ingArr);
@@ -401,6 +408,7 @@ function gettingDishes(dishes) {
         console.log(data.results);
         if (data.results.length === 0) {
           getLocation();
+          return;
         }
         console.log(data.results[index].description);
         while (
@@ -497,7 +505,7 @@ function gettingDishes(dishes) {
           instructionsList.append(listItem);
         }
         urRecipies.disabled = false;
-        urRecipies.classList.remove("cursor-not-allowed")
+        urRecipies.classList.remove("cursor-not-allowed");
         var context = data.results[index];
         console.log(context);
         likeBtn.addEventListener(
@@ -598,4 +606,4 @@ urRecipies.addEventListener("click", showFavorites);
 back2App.addEventListener("click", backToMain);
 resetBtn.addEventListener("click", resetStorage);
 nextBtn.addEventListener("click", nextReceipe);
-prevBtn.addEventListener("click", previousReceipe)
+prevBtn.addEventListener("click", previousReceipe);
